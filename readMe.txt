@@ -7,6 +7,9 @@ possible_words_lister
 Installation:
 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
 
+Update:
+pip install --upgrade git+https://github.com/Rahwbahwdawhb/wordle_stuff
+
 Android installation:
 1.  Download Termux from the Play store
 2.  Open Termux and run:
@@ -20,6 +23,14 @@ Android installation:
     3b.2 source myvenv/bin/activate
     3b.3 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
     3b.4 To uninstall: pip uninstall possible-words-lister
+
+Android update:
+1a. If globally installed:
+    1a.1 pip install --upgrade --force-reinstall --no-cache-dir git+https://github.com/Rahwbahwdawhb/wordle_stuff
+1b. If installed in a Virtual environment:
+    1b.1 If not active: source myvenv/bin/activate 
+    1b.2 pip install --upgrade --force-reinstall --no-cache-dir git+https://github.com/Rahwbahwdawhb/wordle_stuff
+    1b.3 To deactivate: deactivate
 
 Run script:
 1a. If globally installed:
