@@ -6,5 +6,12 @@ possible_words_lister
 Installation:
 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
 
+Android installation:
+1. Download Termux from the Play store
+2. Open Termux and run:
+    2.1 pkg install python3
+    2.2 pkg install git
+    2.3 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
+
 Run script:
 check
