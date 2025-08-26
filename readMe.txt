@@ -14,11 +14,12 @@ Android installation:
      2.2 pkg install git
 3a. Global installation:
     3a.1 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
-    3a.2 To uninstall: pip uninstall 
+    3a.2 To uninstall: pip uninstall possible-words-lister
 3b. Virtual environment installation:
     3b.1 python3 -m venv myvenv
     3b.2 source myvenv/bin/activate
     3b.3 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff
+    3b.4 To uninstall: pip uninstall possible-words-lister
 
 Run script:
 1a. If globally installed:
