@@ -36,18 +36,86 @@ def interactive_letter_check(word_set):
     Input:
     word_set = set of possible words
     """
+    interactive_info_str=\
+    """
+    The command prompt can take up to 3 inputs (separated by -), which are:
+    1. Spare/remaining letters, e.g arplo. This input is mandatory
+    2. Correct indices and letters (green), e.g. for 1st letter being a and 3rd being o: 0a2o
+    3. Misplaced letters (yellow), e.g. ao
+
+    With these examples acceptable inputs are:
+    arplo
+    arplo-0a2o
+    arplo--ao
+    arplo-0a2o-ao
+
+    To display this info again, enter ?
+    To quit, enter !
+    """
+    print(interactive_info_str)
     while True:
-        letter_str=input('Enter spare letters without any separators (e.g. arplo) or ! to exit: ')
-        if letter_str=='!':
+        info_dict={'spare_letters':None,'correct_letters':[],'misplaced_letters':set()}
+        input_str=input('Inputs: ').lower()
+        if input_str=='!':
             break
-        spare_letters={c for c in letter_str.lower()}
-        possible_word_count=0
-        for word in word_set:
-            if {c for c in word}.issubset(spare_letters):
-                possible_word_count+=1
-                print(word)
-        print(f"{possible_word_count} possible words")
-        print()
+        elif input_str=='?':
+            print(interactive_info_str)
+            continue
+        try:
+            check_bool=True
+            for i, info in enumerate(input_str.split('-')):
+                match i:
+                    case 1:
+                        if info!='':
+                            if len(info)%2==0:
+                                temp=[]
+                                for ii in range(0,len(info),2):
+                                    index=int(info[ii])
+                                    if 0<=index<=4:
+                                        if info[ii+1].isalpha():
+                                            temp.append((index,info[ii+1]))
+                                        else:
+                                            print(f"{info[ii+1]} in {index}{info[ii+1]} for the 2nd input is not a letter")
+                                            check_bool=False
+                                            break
+                                    else:
+                                        print('Indices for the 2nd input has to be in the range [0,4]')
+                                        check_bool=False
+                                        break
+                                info_dict['correct_letters']=temp
+                            else:
+                                print('The 2nd input has to have a length divisible by 2.')
+                                check_bool=False
+                                break
+                    case _:
+                        temp=set()
+                        for c in info:
+                            if c.isalpha():
+                                temp.add(c)
+                            else:
+                                print(f"{c} in {info} is not a letter")
+                                check_bool=False
+                                break    
+                match i:
+                    case 0:
+                        info_dict['spare_letters']=temp
+                    case 2:
+                        info_dict['misplaced_letters']=temp
+            if check_bool:
+                possible_word_count=0
+                for word in word_set:
+                    word_to_set={c for c in word}
+                    if word_to_set.issubset(info_dict['spare_letters']) and info_dict['misplaced_letters'].issubset(word_to_set):
+                        match_bool=True
+                        for i,cl in info_dict['correct_letters']:
+                            if word[i]!=cl:
+                                match_bool=False
+                        if match_bool:
+                            possible_word_count+=1
+                            print(word)
+                print(f"{possible_word_count} possible words\n")
+        except Exception as e:
+            print(e)
 
 def main():
     info_str=\
