@@ -5,7 +5,7 @@ setup(
      python_requires=">=3.10",   
      packages=find_packages(),
      package_data={
-        'possible_words_lister': ['words_alpha.txt']
+        'possible_words_lister': ['words_alpha.txt','wordle_words.txt']
     },
     entry_points={
         'console_scripts': [

@@ -1,7 +1,8 @@
 possible_words_lister
     Package to list possible Wordle words given remaining/spare letters
-    The reference words are taken from words_alpha.txt, which was obtained
-    from: https://github.com/dwyl/english-words?tab=readme-ov-file
+    The reference words are taken from:
+        words_alpha.txt, from: https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
+        words_wordle.txt, from: https://github.com/tabatkins/wordle-list/blob/main/words
 
 Installation:
 pip install git+https://github.com/Rahwbahwdawhb/wordle_stuff

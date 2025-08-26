@@ -1,6 +1,7 @@
 from os import chdir
 from os.path import dirname
 from collections.abc import Iterable
+from sys import argv
 
 def get_word_set(word_input):
     """
@@ -49,7 +50,32 @@ def interactive_letter_check(word_set):
         print()
 
 def main():
-    interactive_letter_check(get_word_set('words_alpha.txt'))
+    info_str=\
+    """
+    Initiate an inifinite loop that asks for spare input letters and outputs possible words.
+    
+    Running:
+    check
+    check wordle_words.txt
+
+    uses a reference word list from the Wordle source code: https://github.com/tabatkins/wordle-list/blob/main/words
+    
+    Running:
+    check words_alpha.txt
+
+    uses a more extensive reference word list from: https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
+    """
+    run_bool=True
+    if len(argv) > 1:
+        if argv[1] in ['h','-h','help','-help','--help']:
+            print(info_str)
+            run_bool=False
+        else:
+            word_file = argv[1]
+    else:
+        word_file = 'wordle_words.txt'
+    if run_bool:
+        interactive_letter_check(get_word_set(word_file))
 
 if __name__=='__main__':
     main()
