@@ -2,6 +2,7 @@ from os import chdir
 from os.path import dirname
 from collections.abc import Iterable
 from sys import argv
+import importlib.resources as resources
 
 def get_word_set(word_input):
     """
@@ -16,9 +17,18 @@ def get_word_set(word_input):
     """
     word_set=set()
     if isinstance(word_input,str):
-        chdir(dirname(__file__))
-        with open(word_input) as f:
-            word_input=f.read().strip().split('\n')
+        try:
+            # Works when installed or run as module
+            with resources.open_text("wordle_stuff.data_files", word_input) as f:
+                words = f.read()
+        except (ModuleNotFoundError, FileNotFoundError):
+            from os.path import dirname,join,abspath
+            # Fallback for running check.py directly
+            here = dirname(__file__)
+            data_path = join(here, "..", "data_files", word_input)
+            with open(abspath(data_path)) as f:
+                words = f.read()
+        word_input=words.strip().split('\n')
     if isinstance(word_input,Iterable):
         for word in word_input:
             if len(word)!=5:
@@ -41,7 +51,7 @@ def interactive_letter_check(word_set):
     The command prompt can take up to 3 inputs (separated by -), which are:
     1. Spare/remaining letters, e.g arplo. This input is mandatory
     2. Correct indices and letters (green), e.g. for 1st letter being a and 3rd being o: 0a2o
-    3. Misplaced letters (yellow), e.g. ao
+    3. Letters that should be included (yellow), e.g. ao
 
     With these examples acceptable inputs are:
     arplo

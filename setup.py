@@ -1,15 +1,16 @@
 from setuptools import setup, find_packages
 setup(     
-     name="possible_words_lister",     
-     version="0.1",
+     name="wordle_stuff",     
+     version="1.0",
      python_requires=">=3.10",   
      packages=find_packages(),
      package_data={
-        'possible_words_lister': ['words_alpha.txt','wordle_words.txt']
+        'wordle_stuff': ['data_files/words_alpha.txt','data_files/wordle_words.txt']
     },
     entry_points={
         'console_scripts': [
-            'check = possible_words_lister.check:main',
+            'check = wordle_stuff.possible_words_lister.check:main',
+            'analyze = wordle_stuff.word_analyzer.analyze:main',
         ],
     }
 )
