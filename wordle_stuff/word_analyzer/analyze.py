@@ -1,4 +1,5 @@
 import importlib.resources as resources
+from os.path import dirname,join,abspath
 from sys import argv
 
 def add_to_count_dict(_dict,key):
@@ -77,7 +78,6 @@ def get_nodes(word_file="wordle_words.txt"):
         with resources.open_text("wordle_stuff.data_files", word_file) as f:
             words = f.read()
     except (ModuleNotFoundError, FileNotFoundError):
-        from os.path import dirname,join,abspath
         # Fallback for running check.py directly
         here = dirname(__file__)
         data_path = join(here, "..", "data_files", word_file)

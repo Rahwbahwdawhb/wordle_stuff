@@ -1,6 +1,5 @@
-from os import chdir
-from os.path import dirname
 from collections.abc import Iterable
+from os.path import dirname,join,abspath
 from sys import argv
 import importlib.resources as resources
 
@@ -22,7 +21,6 @@ def get_word_set(word_input):
             with resources.open_text("wordle_stuff.data_files", word_input) as f:
                 words = f.read()
         except (ModuleNotFoundError, FileNotFoundError):
-            from os.path import dirname,join,abspath
             # Fallback for running check.py directly
             here = dirname(__file__)
             data_path = join(here, "..", "data_files", word_input)
