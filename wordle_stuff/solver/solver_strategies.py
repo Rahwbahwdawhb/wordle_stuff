@@ -32,7 +32,8 @@ def implement_strategy(possible_wordle_words_set,potential_letters_dict,
 
 def strategy_1(possible_wordle_words_set,potential_letters_dict,
                        unique_letters_dict,present_letters_set,correct_letters_set,
-                       invald_letters_set,all_words_set,previous_guesses):
+                       invald_letters_set,all_words_set,previous_guesses,
+                       correct_letter_condition=lambda correct_letters:len(correct_letters)<=2):
     present_letters_set_2={ch for _,ch in present_letters_set}
     correct_indices=set()
     correct_letters=set()
@@ -40,17 +41,7 @@ def strategy_1(possible_wordle_words_set,potential_letters_dict,
         correct_indices.add(i)
         correct_letters.add(ch)
     guess_list=[]
-    # if len(correct_letters)==0:
-    # if len(correct_letters)<=1:
-    if len(correct_letters)<=2:
-    # if len(correct_letters)<=3:
-    # if len(correct_letters)<=4:
-    # if len(correct_letters)<=5:
-    # if 4<=len(correct_letters):
-    # if 3<=len(correct_letters):
-    # if 2<=len(correct_letters):
-    # if True:
-    # if False:
+    if correct_letter_condition:
         non_correct_letters=set()
         for word in possible_wordle_words_set:
             for ch in word:
