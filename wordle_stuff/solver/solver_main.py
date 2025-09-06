@@ -66,4 +66,9 @@ for key,values in all_guess_counts_dict.items():
             print_str+=f"Strategy {i}: {100*N/N_iter:1f}%, {_mean:1f}±{std:1f} words left\n"
         else:
             print_str+=f"Strategy {i}: {0}%\n"
-print(print_str)
+# print(print_str)
+
+#0.0002438000519759953, joint filter
+#2.600019797682762e-06, union
+
+#1.1699972674250603e-05, union utanför
