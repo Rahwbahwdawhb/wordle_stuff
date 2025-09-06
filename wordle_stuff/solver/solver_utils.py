@@ -283,8 +283,8 @@ class game_handler:
         if not target_word:
             target_word=next(iter(self._filter_handler.possible_wordle_words_set))
         self.parse_target_word(target_word)
-        invalid_letters_set=set()
-        present_letters_set=set()
+        # invalid_letters_set=set()
+        # present_letters_set=set()
         self.invalid_letters_set=set()
         self.correct_letters_set=set()
         self.present_letters_set=set()
@@ -298,28 +298,28 @@ class game_handler:
             iteration_info_function=lambda next_guess,words_left:None
 
         while True:
-            strategy_inputs=[
-                        self._filter_handler.possible_wordle_words_set,
-                        self._filter_handler.potential_letters_dict,
-                        self._filter_handler.unique_letters_dict,
-                        present_letters_set,
-                        self._filter_handler.correct_letters_count_set,
-                        invalid_letters_set,
-                        all_possible_words,
-                        previous_guesses,
-                        game_strategy
-                    ]
             # strategy_inputs=[
             #             self._filter_handler.possible_wordle_words_set,
             #             self._filter_handler.potential_letters_dict,
             #             self._filter_handler.unique_letters_dict,
-            #             self.present_letters_set,
+            #             present_letters_set,
             #             self._filter_handler.correct_letters_count_set,
-            #             self.invalid_letters_set,
+            #             invalid_letters_set,
             #             all_possible_words,
             #             previous_guesses,
             #             game_strategy
             #         ]
+            strategy_inputs=[
+                        self._filter_handler.possible_wordle_words_set,
+                        self._filter_handler.potential_letters_dict,
+                        self._filter_handler.unique_letters_dict,
+                        self.present_letters_set,
+                        self._filter_handler.correct_letters_count_set,
+                        self.invalid_letters_set,
+                        all_possible_words,
+                        previous_guesses,
+                        game_strategy
+                    ]
             guess_count+=1
             next_guess=implement_strategy(*strategy_inputs)
             if next_guess==target_word:
