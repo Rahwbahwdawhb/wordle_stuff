@@ -14,7 +14,7 @@ def filter_guesses(start_set,sum_function):
 
 def implement_strategy(possible_wordle_words_set,potential_letters_dict,
                        unique_letters_dict,present_letters_set,correct_letters_set,
-                       invald_letters_set,all_words_set,previous_guesses,
+                       invald_letters_set,all_words_set,
                        strategy_function,mandatory_filter_functions=[]):
     N_possible=len(possible_wordle_words_set)
     if N_possible==1:
@@ -22,7 +22,7 @@ def implement_strategy(possible_wordle_words_set,potential_letters_dict,
     else:
         guess_list=strategy_function(possible_wordle_words_set,potential_letters_dict,
                        unique_letters_dict,present_letters_set,correct_letters_set,
-                       invald_letters_set,all_words_set,previous_guesses)
+                       invald_letters_set,all_words_set)
         if not guess_list:
             guess_list=list(possible_wordle_words_set)
         for filter_function in mandatory_filter_functions:
@@ -32,7 +32,7 @@ def implement_strategy(possible_wordle_words_set,potential_letters_dict,
 
 def strategy_1(possible_wordle_words_set,potential_letters_dict,
                        unique_letters_dict,present_letters_set,correct_letters_set,
-                       invald_letters_set,all_words_set,previous_guesses,
+                       invald_letters_set,all_words_set,
                        correct_letter_condition=lambda correct_letters:len(correct_letters)<=2):
     present_letters_set_2={ch for _,ch in present_letters_set}
     correct_indices=set()

@@ -7,36 +7,13 @@ try:
 except ModuleNotFoundError:
     1
 
-class letter:
-    def __init__(self,character):
-        self.character=character
-        self.in_words_set=set()
-        self.occurrence_dict=dict() #keys=number of times the letter appears, values=words in which the letter appears that many times
-        self.positions_dict=dict()
-        self.in_answer_bool=False
-        self.potential_words_set=set()
-    def add_word(self,word,occurrences,positions,prep_bool=True):
-        self.in_words_set.add(word)
-        self.occurrence_dict.setdefault(occurrences,{word}).add(word)
-        for position in positions:
-            self.positions_dict.setdefault(position,{word}).add(word)
-        if prep_bool:
-            self.potential_words_set.add(word)
-    def prep_for_search(self):
-        self.in_answer_bool=False
-        self.potential_words_set={word for word in self.in_words_set}
-
 class filter_handler:
     def __init__(self,word_file="wordle_words.txt"):
-        self.letters_dict=dict()
         self.potential_letters_dict=dict()
         self.present_letters_count_dict=dict()
         self.correct_letters_count_set=set()
         for ch in range(ord('a'), ord('z') + 1):
-            _letter=letter(chr(ch))
-            _letter.prep_for_search()
-            self.letters_dict[chr(ch)]=_letter
-            self.potential_letters_dict[chr(ch)]=_letter
+            self.potential_letters_dict[chr(ch)]=False
             self.present_letters_count_dict[chr(ch)]=0
         try:
         # Works when installed or run as module
@@ -72,98 +49,22 @@ class filter_handler:
                 self.unique_letters_dict[word]=len(temp_count_dict)
                 self.overall_word_letter_dict[word]=temp_count_dict #new, for single loop filtering
                 for ch,count in temp_count_dict.items():
-                    self.letters_dict[ch].add_word(word,count,temp_position_dict[ch])
                     self.wordle_words_dict.setdefault(word,{ch}).add(ch)
     def reset(self):
         self.possible_wordle_words_set=set(self.wordle_words_dict.keys())
-        for ch,_letter in self.letters_dict.items():
-            _letter.prep_for_search()
-            self.potential_letters_dict[ch]=_letter
+        for ch in self.potential_letters_dict.keys():
+            self.potential_letters_dict[ch]=False
             self.present_letters_count_dict[ch]=0
         self.correct_letters_count_set=set()
-    def handle_present_letters(self,present_letters,sync_potential_letter_dicts_bool=False):
-        if present_letters:
-            present_letters_ch=set()
-            blocked_positions=set()
-            for position,ch in present_letters:
-                present_letters_ch.add(ch)
-                blocked_positions.add((position,ch))
-            N_letters_ch=len(present_letters_ch)
-            for word in list(self.possible_wordle_words_set):
-                temp_check_dict=dict()
-                ok_1=True
-                ok_2=True
-                for i,ch in enumerate(word):
-                    if (i,ch) in blocked_positions:
-                        ok_1=False
-                        break
-                    if ch in present_letters_ch:
-                        temp_check_dict[ch]=True
-                
-                if len(temp_check_dict)!=N_letters_ch:
-                    ok_2=False
-                if not (ok_1 and ok_2):
-                    self.possible_wordle_words_set.remove(word)
-            if sync_potential_letter_dicts_bool:
-                self.sync_potential_letter_dicts()
-    def handle_correct_letters(self,correct_letters,sync_potential_letter_dicts_bool=False):
-        temp_count_dict=dict()
-        for position,ch in correct_letters:
-            self.correct_letters_count_set.add((position,ch))
-            ref_set=self.potential_letters_dict[ch].positions_dict[position]
-            self.potential_letters_dict[ch].in_answer_bool=True
-            temp_count_dict[ch]=temp_count_dict.get(ch,0)+1
-            self.possible_wordle_words_set=self.possible_wordle_words_set.intersection(ref_set)
-        for ch,temp_count in temp_count_dict.items():
-            self.present_letters_count_dict[ch]=max(self.present_letters_count_dict[ch],temp_count)
-        if sync_potential_letter_dicts_bool:
-            self.sync_potential_letter_dicts()
-    def handle_invalid_letters(self,invalid_letters,sync_potential_letter_dicts_bool=False):
-        for ch in invalid_letters:
-            try:
-                _letter=self.potential_letters_dict[ch]
-            except KeyError: #if guess includes invalid letter already deleted from previous guess
-                continue
-            if _letter.in_answer_bool:
-                for occurrence,words in _letter.occurrence_dict.items():
-                    if self.present_letters_count_dict[ch]<occurrence:
-                        for word in words:
-                            try:
-                                _letter.potential_words_set.remove(word)
-                            except KeyError:
-                                pass
-                            try:
-                                self.possible_wordle_words_set.remove(word)
-                            except KeyError:
-                                pass
-            else:
-                for word in list(_letter.potential_words_set):
-                    try:
-                        self.possible_wordle_words_set.remove(word)
-                    except KeyError:
-                        pass
-                    _letter.potential_words_set.remove(word)
-                del self.potential_letters_dict[ch]
-        if sync_potential_letter_dicts_bool:
-            self.sync_potential_letter_dicts()
-    def sync_potential_letter_dicts(self):
-        for ch,_letter in self.potential_letters_dict.items():
-            _letter.potential_words_set=_letter.potential_words_set.intersection(self.possible_wordle_words_set)
-    # def debug(self):
-    #     if 'tower' not in self.possible_wordle_words_set:
-    #         1
     def handle_input_letters(self,invalid_letters,new_present_letters_set,new_present_letters_dict,correct_letters,sync_potential_letter_dicts_bool=False):
         temp_count_dict=dict()
         for position_ch in  correct_letters:
             self.correct_letters_count_set.add(position_ch)
-            self.potential_letters_dict[position_ch[1]].in_answer_bool=True
+            self.potential_letters_dict[position_ch[1]]=True
             temp_count_dict[position_ch[1]]=temp_count_dict.get(position_ch[1],0)+1
-        for ch,temp_count in temp_count_dict.items():
-            self.present_letters_count_dict[ch]=max(self.present_letters_count_dict[ch],temp_count)
-        # present_letters_ch_dict=dict()
+            self.present_letters_count_dict[position_ch[1]]=max(self.present_letters_count_dict[position_ch[1]],temp_count_dict[position_ch[1]])
         for _,ch in new_present_letters_set:
-            # present_letters_ch_dict[ch]=present_letters_ch_dict.get(ch,0)+1
-            self.potential_letters_dict[ch].in_answer_bool=True
+            self.potential_letters_dict[ch]=True
         
         for word in list(self.possible_wordle_words_set):
             if correct_letters:
@@ -201,16 +102,12 @@ class filter_handler:
             if invalid_letters:
                 for ch in invalid_letters:
                     if ch in word:
-                        if self.letters_dict[ch].in_answer_bool:
+                        if self.potential_letters_dict[ch]:
                             if self.overall_word_letter_dict[word][ch]<self.present_letters_count_dict[ch]:
                                 self.possible_wordle_words_set.remove(word)
                         else:
                             try:
                                 self.possible_wordle_words_set.remove(word)
-                            except KeyError:
-                                pass
-                            try:
-                                del self.potential_letters_dict[ch]
                             except KeyError:
                                 pass
 
@@ -283,12 +180,9 @@ class game_handler:
         if not target_word:
             target_word=next(iter(self._filter_handler.possible_wordle_words_set))
         self.parse_target_word(target_word)
-        # invalid_letters_set=set()
-        # present_letters_set=set()
         self.invalid_letters_set=set()
         self.correct_letters_set=set()
         self.present_letters_set=set()
-        previous_guesses=set()
         guess_count=0
         if verbose_bool:
             finish_info_function=lambda target_word,guess_count,words_left:print(f"Target word {target_word} found in {guess_count} guesses, {len(words_left)} possible words left")
@@ -298,17 +192,6 @@ class game_handler:
             iteration_info_function=lambda next_guess,words_left:None
 
         while True:
-            # strategy_inputs=[
-            #             self._filter_handler.possible_wordle_words_set,
-            #             self._filter_handler.potential_letters_dict,
-            #             self._filter_handler.unique_letters_dict,
-            #             present_letters_set,
-            #             self._filter_handler.correct_letters_count_set,
-            #             invalid_letters_set,
-            #             all_possible_words,
-            #             previous_guesses,
-            #             game_strategy
-            #         ]
             strategy_inputs=[
                         self._filter_handler.possible_wordle_words_set,
                         self._filter_handler.potential_letters_dict,
@@ -317,7 +200,6 @@ class game_handler:
                         self._filter_handler.correct_letters_count_set,
                         self.invalid_letters_set,
                         all_possible_words,
-                        previous_guesses,
                         game_strategy
                     ]
             guess_count+=1
@@ -326,27 +208,13 @@ class game_handler:
                 finish_info_function(target_word,guess_count,self._filter_handler.possible_wordle_words_set)
                 break
             iteration_info_function(next_guess,self._filter_handler.possible_wordle_words_set)
-            previous_guesses.add(next_guess) #this will be removed
             #remove guess from possible words, within try as some strategies can suggest invalid words
             try:
                 self._filter_handler.possible_wordle_words_set.remove(next_guess)
             except KeyError:
                 pass
             t0=perf_counter()
-            # incorrect_letters,correct_letters,verified_present_letters=self.evaluate_word(next_guess)
-            # present_letters_set=present_letters_set.union(verified_present_letters)
-            # invalid_letters_set=invalid_letters_set.union(incorrect_letters)
             verified_present_letters_dict=self.evaluate_word_2(next_guess)
-            # separate filtering functions
-            # t0=perf_counter()
-            # self._filter_handler.handle_present_letters(verified_present_letters)
-            # self._filter_handler.handle_correct_letters(correct_letters)
-            # self._filter_handler.handle_invalid_letters(incorrect_letters)            
             print(perf_counter()-t0)
-            # present_letters_set=present_letters_set.union(verified_present_letters_set)
-            # joint filtering functions
-            # self._filter_handler.handle_input_letters(incorrect_letters,verified_present_letters,correct_letters)
             self._filter_handler.handle_input_letters(self.invalid_letters_set,self.present_letters_set,verified_present_letters_dict,self.correct_letters_set)
-            # self._filter_handler.handle_input_letters(self.invalid_letters_set,self.present_letters_set,correct_letters)
-            # print(perf_counter()-t0)
         return guess_count,self._filter_handler.possible_wordle_words_set
