@@ -1,9 +1,8 @@
 import importlib.resources as resources
 from os.path import dirname,join,abspath
-from time import perf_counter
 
 try:
-    from solver_strategies import implement_strategy
+    from solver_strategies import implement_strategy, implement_strategy_mod
 except ModuleNotFoundError:
     1
 
@@ -204,6 +203,7 @@ class game_handler:
                     ]
             guess_count+=1
             next_guess=implement_strategy(*strategy_inputs)
+            # next_guess=implement_strategy_mod(*strategy_inputs)
             if next_guess==target_word:
                 finish_info_function(target_word,guess_count,self._filter_handler.possible_wordle_words_set)
                 break
@@ -213,8 +213,6 @@ class game_handler:
                 self._filter_handler.possible_wordle_words_set.remove(next_guess)
             except KeyError:
                 pass
-            t0=perf_counter()
             verified_present_letters_dict=self.evaluate_word_2(next_guess)
-            print(perf_counter()-t0)
             self._filter_handler.handle_input_letters(self.invalid_letters_set,self.present_letters_set,verified_present_letters_dict,self.correct_letters_set)
         return guess_count,self._filter_handler.possible_wordle_words_set
