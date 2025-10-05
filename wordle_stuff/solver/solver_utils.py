@@ -26,8 +26,11 @@ class filter_handler:
                 words = f.read()
         finally:
             self.possible_wordle_words_set=set()
-            self.wordle_words_dict=dict()
+            self.wordle_words_dict=dict() #remove?
             self.unique_letters_dict=dict()
+
+            self.letter_in_words_dict=dict() #new, count how many words a letter appears in
+            self.position_words_dict=dict() #new, how many words a letter at a given position appears in
 
             self.overall_word_position_dict=dict() #new, for single loop filtering
             self.overall_word_letter_dict=dict() #new, for single loop filtering
@@ -42,10 +45,17 @@ class filter_handler:
                 temp_position_dict=dict()
                 self.overall_word_position_dict[word]=set() #new, for single loop filtering
                 for i,ch in enumerate(word):
-                    temp_count_dict[ch]=temp_count_dict.get(ch, 0)+1
+                    # temp_count_dict[ch]=temp_count_dict.get(ch, 0)+1
+                    if ch in temp_count_dict:
+                        temp_count_dict[ch][0]+=1
+                        temp_count_dict[ch][1].append((i,ch))
+                    else:
+                        temp_count_dict[ch]=[1,[(i,ch)]]
                     temp_position_dict.setdefault(ch,{i}).add(i)
                     self.overall_word_position_dict[word].add((i,ch)) #new, for single loop filtering
-                self.unique_letters_dict[word]=len(temp_count_dict)
+                    self.letter_in_words_dict[ch]=self.letter_in_words_dict.get(ch, 0)+1
+                    self.position_words_dict.setdefault((i,ch),{word}).add(word) #new, how many words a letter at a given position appears in
+                self.unique_letters_dict[word]=len(temp_count_dict) #new, count how unique letters a word has
                 self.overall_word_letter_dict[word]=temp_count_dict #new, for single loop filtering
                 for ch,count in temp_count_dict.items():
                     self.wordle_words_dict.setdefault(word,{ch}).add(ch)
@@ -90,7 +100,8 @@ class filter_handler:
                         #the entire possible word set would get empty since the words that are present
                         #are those that did not have 
                         for ch,count in new_present_letters_dict.items():
-                            if ch not in self.overall_word_letter_dict[word] or self.overall_word_letter_dict[word][ch]<count:
+                            # if ch not in self.overall_word_letter_dict[word] or self.overall_word_letter_dict[word][ch]<count:
+                            if ch not in self.overall_word_letter_dict[word] or self.overall_word_letter_dict[word][ch][0]<count:
                                 self.possible_wordle_words_set.remove(word)
                                 word_removed_bool=True
                                 break
@@ -102,7 +113,8 @@ class filter_handler:
                 for ch in invalid_letters:
                     if ch in word:
                         if self.potential_letters_dict[ch]:
-                            if self.overall_word_letter_dict[word][ch]<self.present_letters_count_dict[ch]:
+                            # if self.overall_word_letter_dict[word][ch]<self.present_letters_count_dict[ch]:
+                            if self.overall_word_letter_dict[word][ch][0]<self.present_letters_count_dict[ch]:
                                 self.possible_wordle_words_set.remove(word)
                         else:
                             try:
@@ -173,7 +185,7 @@ class game_handler:
                 verified_present_letters_dict[ch]=verified_present_letters_dict.get(ch,0)+1
         return verified_present_letters_dict
 
-    def start_noninteractive_game(self,game_strategy,target_word=None,verbose_bool=False):
+    def start_noninteractive_game(self,game_strategy,target_word=None,verbose_bool=False,extra_inputs=[]):
         self._filter_handler.reset()
         all_possible_words=set(self._filter_handler.wordle_words_dict.keys())
         if not target_word:
@@ -199,11 +211,12 @@ class game_handler:
                         self._filter_handler.correct_letters_count_set,
                         self.invalid_letters_set,
                         all_possible_words,
-                        game_strategy
+                        game_strategy,
+                        extra_inputs
                     ]
             guess_count+=1
-            next_guess=implement_strategy(*strategy_inputs)
-            # next_guess=implement_strategy_mod(*strategy_inputs)
+            # next_guess=implement_strategy(*strategy_inputs)
+            next_guess=implement_strategy_mod(*strategy_inputs)
             if next_guess==target_word:
                 finish_info_function(target_word,guess_count,self._filter_handler.possible_wordle_words_set)
                 break
